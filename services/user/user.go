@@ -1,11 +1,11 @@
 package user
 
 import (
+	"bootcamp/config"
 	"bootcamp/entity"
-	"bootcamp/infra"
 	"bootcamp/repository"
-	"fmt"
 	"errors"
+	"fmt"
 	"math/rand"
 	"strconv"
 	"strings"
@@ -23,7 +23,7 @@ type UserService struct {
 
 // CreateUser func is used to create user data
 func (service UserService) CreateUser(data entity.RegistrationUserEntity) (bool, error) {
-	var validate infra.Validator
+	var validate config.Validator
 
 	v := validate.NewValidator()
 	err := v.Validate(data)
@@ -106,7 +106,7 @@ func CreateInitialName(fullName string) string {
 // GenerateUserName is func to split create initial name
 func GenerateUserName(name []string) string {
 	// find userName, if already exist add index number
-	var service repository.UserRepositoryInterface = repository.UserRepository{} 
+	var service repository.UserRepositoryInterface = repository.UserRepository{}
 	data := service.GetUserByName(name[0], name[2])
 	totalData := len(data)
 
