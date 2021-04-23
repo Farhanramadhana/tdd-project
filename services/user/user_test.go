@@ -1,6 +1,7 @@
 package user
 
 import (
+	"bootcamp/entity"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -19,13 +20,13 @@ func TestCreateUser(t *testing.T) {
 	r := gin.Default()
 	r.POST(
 		url,
-		CreateUser,
+		CreateUserHandler(),
 	)
 
-	payload := UserPayload{
+	payload := entity.RegistrationUserEntity{
 		FullName: "farhan ramadhana",
 		Email:    "frans@kata.ai",
-		Password: "pass",
+		Password: "password12345",
 		Role:     "admin",
 	}
 
