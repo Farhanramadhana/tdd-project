@@ -1,44 +1,39 @@
 package user
 
 import (
+	"bootcamp/entity"
 	"bootcamp/infra"
 	"bootcamp/repository"
 	"fmt"
+	"errors"
 	"math/rand"
-	"net/http"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/gin-gonic/gin"
 )
 
-type UserPayload struct {
-	FullName string `validate:"required"`
-	Email    string `validate:"required,email"`
-	Password string `validate:"required,min=10"`
-	Role     string `validate:"required"`
+type UserServiceInterface interface {
+	CreateUser(data entity.RegistrationUserEntity) (bool, error)
+	GetAllUser() []entity.DataUserEntity
+}
+
+type UserService struct {
+	repository repository.UserRepository
 }
 
 // CreateUser func is used to create user data
-func CreateUser(c *gin.Context) {
-	var data UserPayload
-	err := c.ShouldBindJSON(&data)
-	if err != nil {
-		fmt.Println(err)
-	}
-
+func (service UserService) CreateUser(data entity.RegistrationUserEntity) (bool, error) {
 	var validate infra.Validator
+
 	v := validate.NewValidator()
-	err = v.Validate(data)
+	err := v.Validate(data)
 
 	if err != nil {
-		err2 := strings.Split(err.Error(), ",")
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  "Error",
-			"message": err2,
-		})
-		return
+		// c.JSON(http.StatusBadRequest, gin.H{
+		// 	"status":  "Error",
+		// 	"message": err2,
+		// })
+		return false, err
 	}
 
 	name := SplitFullName(data.FullName)
@@ -46,7 +41,7 @@ func CreateUser(c *gin.Context) {
 	userName := GenerateUserName(name)
 	ID := GenerateID()
 
-	user := repository.DataUser{
+	user := entity.DataUserEntity{
 		ID:          ID,
 		FirstName:   name[0],
 		MiddleName:  name[1],
@@ -59,29 +54,20 @@ func CreateUser(c *gin.Context) {
 		UpdatedAt:   "2020-02-02",
 	}
 
-	createUser := user.CreateUser()
-
+	fmt.Print(user)
+	createUser := service.repository.CreateUser(user)
 	if createUser {
-		c.JSON(http.StatusOK, gin.H{
-			"status": "success create user data",
-		})
-		return
+		return true, nil
 	}
 
-	c.JSON(http.StatusBadRequest, gin.H{
-		"status": "failed create user data",
-	})
+	return false, errors.New("failed create user data")
 }
 
 // GetAllUser func is used to retrieve all data user
-func GetAllUser(c *gin.Context) {
-	userData := repository.GetAllUser()
-
-	c.JSON(http.StatusBadRequest, gin.H{
-		"status": "ok",
-		"data":   userData,
-	})
-	return
+func (service UserService) GetAllUser() []entity.DataUserEntity {
+	// var repo repository.UserRepositoryInterface = repository.UserRepository{}
+	userData := service.repository.GetAllUser()
+	return userData
 }
 
 // SplitFullName is func to split fullname to first, middle, and last of Name
@@ -120,7 +106,8 @@ func CreateInitialName(fullName string) string {
 // GenerateUserName is func to split create initial name
 func GenerateUserName(name []string) string {
 	// find userName, if already exist add index number
-	data := repository.GetUserByName(name[0], name[2])
+	var service repository.UserRepositoryInterface = repository.UserRepository{} 
+	data := service.GetUserByName(name[0], name[2])
 	totalData := len(data)
 
 	var userName string

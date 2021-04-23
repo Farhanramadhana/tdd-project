@@ -1,41 +1,34 @@
 package repository
 
-type UserRepository interface {
-	CreateUser() bool
-	GetAllUser() []DataUser
-	UpdateUser() bool
-	GetUserById(id string) DataUser
+import (
+	"bootcamp/entity"
+)
+
+type UserRepositoryInterface interface {
+	CreateUser(d entity.DataUserEntity) bool
+	GetAllUser() []entity.DataUserEntity
+	GetUserById(id string) entity.DataUserEntity
+	GetUserByName(firstName, lastName string) []entity.DataUserEntity
 }
 
-type DataUser struct {
-	ID          string
-	FirstName   string
-	MiddleName  string
-	LastName    string
-	Username    string
-	Role        string
-	InitialName string
-	Email       string
-	Password    string
-	UpdatedAt   string
-}
+type UserRepository struct{}
 
-var data []DataUser
+var data []entity.DataUserEntity
 
 //CreateUser is to save data to database
-func (d DataUser) CreateUser() bool {
+func (u UserRepository) CreateUser(d entity.DataUserEntity) bool {
 	data = append(data, d)
 	return true
 }
 
 // FindByID return specific user detail by id
-func GetAllUser() []DataUser {
+func (u UserRepository) GetAllUser() []entity.DataUserEntity {
 	return data
 }
 
 // FindByID return specific user detail by id
-func GetUserById(id string) DataUser {
-	return DataUser{
+func (u UserRepository) GetUserById(id string) entity.DataUserEntity {
+	return entity.DataUserEntity{
 		ID:          "123",
 		FirstName:   "farhan",
 		MiddleName:  "stona",
@@ -49,8 +42,8 @@ func GetUserById(id string) DataUser {
 	}
 }
 
-func GetUserByName(firstName, lastName string) []DataUser {
-	var user []DataUser
+func (u UserRepository) GetUserByName(firstName, lastName string) []entity.DataUserEntity {
+	var user []entity.DataUserEntity
 	for _, v := range data {
 		if firstName == v.FirstName && lastName == v.LastName {
 			user = append(user, v)
