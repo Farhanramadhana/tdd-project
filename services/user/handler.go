@@ -1,8 +1,7 @@
-package handler
+package user
 
 import (
 	"bootcamp/entity"
-	"bootcamp/services/user"
 	"fmt"
 	"net/http"
 
@@ -13,7 +12,7 @@ import (
 func CreateUserHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var data entity.RegistrationUserEntity
-		var userService user.UserServiceInterface = user.UserService{}
+		var userService UserServiceInterface = UserService{}
 
 		err := c.ShouldBindJSON(&data)
 		if err != nil {
@@ -37,7 +36,7 @@ func CreateUserHandler() gin.HandlerFunc {
 // GetAllUser func is used to retrieve all data user
 func GetAllUserHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var userService *user.UserService = new(user.UserService)
+		var userService UserServiceInterface = UserService{}
 		userData := userService.GetAllUser()
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status": "ok",
