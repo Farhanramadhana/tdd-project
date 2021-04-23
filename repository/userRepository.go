@@ -5,7 +5,7 @@ import (
 )
 
 type UserRepositoryInterface interface {
-	CreateUser(d entity.DataUserEntity) bool
+	CreateUser(d entity.DataUserEntity) entity.DataUserEntity
 	GetAllUser() []entity.DataUserEntity
 	GetUserById(id string) entity.DataUserEntity
 	GetUserByName(firstName, lastName string) []entity.DataUserEntity
@@ -16,9 +16,9 @@ type UserRepository struct{}
 var data []entity.DataUserEntity
 
 //CreateUser is to save data to database
-func (u UserRepository) CreateUser(d entity.DataUserEntity) bool {
+func (u UserRepository) CreateUser(d entity.DataUserEntity) entity.DataUserEntity {
 	data = append(data, d)
-	return true
+	return d
 }
 
 // FindByID return specific user detail by id

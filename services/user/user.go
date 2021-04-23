@@ -4,16 +4,17 @@ import (
 	"bootcamp/config"
 	"bootcamp/entity"
 	"bootcamp/repository"
-	"errors"
 	"fmt"
 	"math/rand"
 	"strconv"
 	"strings"
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserServiceInterface interface {
-	CreateUser(data entity.RegistrationUserEntity) (bool, error)
+	CreateUser(data entity.RegistrationUserEntity) (entity.DataUserEntity, error)
 	GetAllUser() []entity.DataUserEntity
 }
 
@@ -22,24 +23,21 @@ type UserService struct {
 }
 
 // CreateUser func is used to create user data
-func (service UserService) CreateUser(data entity.RegistrationUserEntity) (bool, error) {
+func (service UserService) CreateUser(data entity.RegistrationUserEntity) (entity.DataUserEntity, error) {
 	var validate config.Validator
 
 	v := validate.NewValidator()
 	err := v.Validate(data)
 
 	if err != nil {
-		// c.JSON(http.StatusBadRequest, gin.H{
-		// 	"status":  "Error",
-		// 	"message": err2,
-		// })
-		return false, err
+		return entity.DataUserEntity{}, err
 	}
 
 	name := SplitFullName(data.FullName)
 	initialName := CreateInitialName(data.FullName)
 	userName := GenerateUserName(name)
 	ID := GenerateID()
+	password := EncryptPassword(data.Password)
 
 	user := entity.DataUserEntity{
 		ID:          ID,
@@ -50,17 +48,12 @@ func (service UserService) CreateUser(data entity.RegistrationUserEntity) (bool,
 		Role:        data.Role,
 		InitialName: initialName,
 		Email:       data.Email,
-		Password:    data.Password,
-		UpdatedAt:   "2020-02-02",
+		Password:    password,
+		UpdatedAt:   time.Now().Format(time.RFC3339),
 	}
 
-	fmt.Print(user)
-	createUser := service.repository.CreateUser(user)
-	if createUser {
-		return true, nil
-	}
-
-	return false, errors.New("failed create user data")
+	dataUser := service.repository.CreateUser(user)
+	return dataUser, nil
 }
 
 // GetAllUser func is used to retrieve all data user
@@ -139,4 +132,15 @@ func GenerateID() string {
 	}
 	id := b.String()
 	return id
+}
+
+func EncryptPassword(password string) string {
+	pwd := []byte(password)
+	hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
+
+	if err != nil {
+		fmt.Print(err.Error())
+	}
+
+	return (string(hash))
 }

@@ -19,16 +19,18 @@ func CreateUserHandler() gin.HandlerFunc {
 			fmt.Println(err)
 		}
 
-		createUser, err := userService.CreateUser(data)
-		if createUser {
-			c.JSON(http.StatusOK, gin.H{
-				"status": "success create user data",
+		dataUser, err := userService.CreateUser(data)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status":  "error",
+				"message": err.Error(),
 			})
 			return
 		}
 
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": "failed create user data",
+		c.JSON(http.StatusOK, gin.H{
+			"status": "ok",
+			"data":   dataUser,
 		})
 	}
 }
