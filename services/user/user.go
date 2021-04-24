@@ -15,7 +15,11 @@ import (
 
 type UserServiceInterface interface {
 	CreateUser(data entity.RegistrationUserEntity) (entity.DataUserEntity, error)
-	GetAllUser() []entity.DataUserEntity
+	GetAllUser() ([]entity.DataUserEntity, bool)
+	GetUserByUsername(username string) (entity.DataUserEntity, bool)
+	GetUserById(id string) (entity.DataUserEntity, bool)
+	GetUserByEmail(email string) (entity.DataUserEntity, bool)
+	DeleteUserById(id string) (entity.DataUserEntity, bool)
 }
 
 type UserService struct {
@@ -57,10 +61,29 @@ func (service UserService) CreateUser(data entity.RegistrationUserEntity) (entit
 }
 
 // GetAllUser func is used to retrieve all data user
-func (service UserService) GetAllUser() []entity.DataUserEntity {
-	// var repo repository.UserRepositoryInterface = repository.UserRepository{}
-	userData := service.repository.GetAllUser()
-	return userData
+func (service UserService) GetAllUser() ([]entity.DataUserEntity, bool) {
+	userData, isExist := service.repository.GetAllUser()
+	return userData, isExist
+}
+
+func (service UserService) GetUserByUsername(username string) (entity.DataUserEntity, bool) {
+	userData, isExist := service.repository.GetUserByUserName(username)
+	return userData, isExist
+}
+
+func (service UserService) GetUserById(id string) (entity.DataUserEntity, bool) {
+	userData, isExist := service.repository.GetUserById(id)
+	return userData, isExist
+}
+
+func (service UserService) GetUserByEmail(email string) (entity.DataUserEntity, bool) {
+	userData, isExist := service.repository.GetUserByEmail(email)
+	return userData, isExist
+}
+
+func (service UserService) DeleteUserById(id string) (entity.DataUserEntity, bool) {
+	userData, isExist := service.repository.DeleteUserById(id)
+	return userData, isExist
 }
 
 // SplitFullName is func to split fullname to first, middle, and last of Name
