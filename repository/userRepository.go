@@ -2,53 +2,107 @@ package repository
 
 import (
 	"bootcamp/entity"
+	"container/list"
 )
 
 type UserRepositoryInterface interface {
 	CreateUser(d entity.DataUserEntity) entity.DataUserEntity
-	GetAllUser() []entity.DataUserEntity
-	GetUserById(id string) entity.DataUserEntity
+	GetAllUser() ([]entity.DataUserEntity, bool)
+	GetUserById(id string) (entity.DataUserEntity, bool)
+	GetUserByUserName(username string) (entity.DataUserEntity, bool)
+	GetUserByEmail(email string) (entity.DataUserEntity, bool)
 	GetUserByName(firstName, lastName string) []entity.DataUserEntity
+	DeleteUserById(id string) (entity.DataUserEntity, bool)
+	// UpdateUserById(id string) (entity.DataUserEntity, bool)
 }
 
 type UserRepository struct{}
 
-var data []entity.DataUserEntity
+var l = list.New()
 
-//CreateUser is to save data to database
+// CreateUser is to save data to linkedlist
 func (u UserRepository) CreateUser(d entity.DataUserEntity) entity.DataUserEntity {
-	data = append(data, d)
+	l.PushFront(d)
 	return d
 }
 
-// FindByID return specific user detail by id
-func (u UserRepository) GetAllUser() []entity.DataUserEntity {
-	return data
-}
-
-// FindByID return specific user detail by id
-func (u UserRepository) GetUserById(id string) entity.DataUserEntity {
-	return entity.DataUserEntity{
-		ID:          "123",
-		FirstName:   "farhan",
-		MiddleName:  "stona",
-		LastName:    "ramadhana",
-		Username:    "frans",
-		Role:        "admin",
-		InitialName: "FSR",
-		Email:       "frans@kata.ai",
-		Password:    "pass",
-		UpdatedAt:   "2020-02-02",
+// GetAllUser return all user detail
+func (u UserRepository) GetAllUser() ([]entity.DataUserEntity, bool) {
+	var data []entity.DataUserEntity
+	if l.Len() <= 0 {
+		return data, false
 	}
+
+	// Iterate through list and print its contents.
+	for e := l.Front(); e != nil; e = e.Next() {
+		data = append(data, e.Value.(entity.DataUserEntity))
+	}
+
+	return data, true
 }
 
+// GetUserById return specific user detail by id
+func (u UserRepository) GetUserById(id string) (entity.DataUserEntity, bool) {
+	// Iterate through list and print its contents.
+	for e := l.Front(); e != nil; e = e.Next() {
+		data := e.Value.(entity.DataUserEntity)
+		if id == data.ID {
+			return data, true
+		}
+	}
+	return entity.DataUserEntity{}, false
+}
+
+// GetUserByUserName return specific user detail by username
+func (u UserRepository) GetUserByUserName(username string) (entity.DataUserEntity, bool) {
+	// Iterate through list and print its contents.
+	for e := l.Front(); e != nil; e = e.Next() {
+		data := e.Value.(entity.DataUserEntity)
+		if username == data.Username {
+			return data, true
+		}
+	}
+	return entity.DataUserEntity{}, false
+}
+
+// GetUserByEmail return specific user detail by email
+func (u UserRepository) GetUserByEmail(email string) (entity.DataUserEntity, bool) {
+	// Iterate through list and print its contents.
+	for e := l.Front(); e != nil; e = e.Next() {
+		data := e.Value.(entity.DataUserEntity)
+		if email == data.Email {
+			return data, true
+		}
+	}
+	return entity.DataUserEntity{}, false
+}
+
+// GetUserByName return specific user detail by name
 func (u UserRepository) GetUserByName(firstName, lastName string) []entity.DataUserEntity {
 	var user []entity.DataUserEntity
-	for _, v := range data {
-		if firstName == v.FirstName && lastName == v.LastName {
-			user = append(user, v)
+
+	// Iterate through list and print its contents.
+	for e := l.Front(); e != nil; e = e.Next() {
+		data := e.Value.(entity.DataUserEntity)
+		if firstName == data.FirstName && lastName == data.LastName {
+			user = append(user, data)
+		}
+	}
+	return user
+}
+
+func (u UserRepository) DeleteUserById(id string) (entity.DataUserEntity, bool) {
+	for e := l.Front(); e != nil; e = e.Next() {
+		data := e.Value.(entity.DataUserEntity)
+		if id == data.ID {
+			l.Remove(e)
+			return e.Value.(entity.DataUserEntity), true
 		}
 	}
 
-	return user
+	return entity.DataUserEntity{}, false
 }
+
+// func (u UserRepository) UpdateUserById(id string) (entity.DataUserEntity, bool) {
+
+// }
