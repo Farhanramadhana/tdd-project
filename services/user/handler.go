@@ -8,9 +8,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// CreateUser func is used to create user data
+// CreateUserHandler func is used to create user data
 func CreateUserHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		role, _ := c.Get("Role")
+
+		if role != "admin" {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status":  "error",
+				"message": "forbidden",
+			})
+			return
+		}
+
 		var data entity.RegistrationUserEntity
 		var userService UserServiceInterface = UserService{}
 
@@ -38,11 +48,151 @@ func CreateUserHandler() gin.HandlerFunc {
 // GetAllUser func is used to retrieve all data user
 func GetAllUserHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		role, _ := c.Get("Role")
+
+		if role != "admin" && role != "user" {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status":  "error",
+				"message": "forbidden",
+			})
+			return
+		}
+
 		var userService UserServiceInterface = UserService{}
-		userData := userService.GetAllUser()
-		c.JSON(http.StatusBadRequest, gin.H{
+		userData, isExist := userService.GetAllUser()
+
+		if !isExist {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status": "ok",
+				"data":   "null",
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
 			"status": "ok",
 			"data":   userData,
+		})
+	}
+}
+
+func GetUserByUsernameHandler() gin.HandlerFunc {
+	fmt.Print("lalalal")
+	return func(c *gin.Context) {
+		role, _ := c.Get("Role")
+
+		if role != "admin" && role != "user" {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status":  "error",
+				"message": "forbidden",
+			})
+			return
+		}
+
+		var userService UserServiceInterface = UserService{}
+		userData, isExist := userService.GetUserByUsername(c.Param("username"))
+
+		if !isExist {
+			c.JSON(http.StatusOK, gin.H{
+				"status": "ok",
+				"data":   "null",
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"status": "ok",
+			"data":   userData,
+		})
+	}
+}
+
+func GetUserByEmailHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		role, _ := c.Get("Role")
+
+		if role != "admin" && role != "user" {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status":  "error",
+				"message": "forbidden",
+			})
+			return
+		}
+
+		var userService UserServiceInterface = UserService{}
+		userData, isExist := userService.GetUserByEmail(c.Param("email"))
+
+		if !isExist {
+			c.JSON(http.StatusOK, gin.H{
+				"status": "ok",
+				"data":   "null",
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"status": "ok",
+			"data":   userData,
+		})
+	}
+}
+
+func GetUserByIdHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		role, _ := c.Get("Role")
+
+		if role != "admin" && role != "user" {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status":  "error",
+				"message": "forbidden",
+			})
+			return
+		}
+
+		var userService UserServiceInterface = UserService{}
+		userData, isExist := userService.GetUserById(c.Param("id"))
+
+		if !isExist {
+			c.JSON(http.StatusOK, gin.H{
+				"status": "ok",
+				"data":   "null",
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"status": "ok",
+			"data":   userData,
+		})
+	}
+}
+
+func DeleteUserById() gin.HandlerFunc {
+		return func(c *gin.Context) {
+		role, _ := c.Get("Role")
+
+		if role != "admin" {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status":  "error",
+				"message": "forbidden",
+			})
+			return
+		}
+
+		var userService UserServiceInterface = UserService{}
+		userData, isExist := userService.DeleteUserById(c.Param("id"))
+
+		if !isExist {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status": "ok",
+				"data":   "null",
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"status": "ok",
+			"data": userData,
 		})
 	}
 }
