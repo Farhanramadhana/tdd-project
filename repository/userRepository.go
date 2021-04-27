@@ -8,12 +8,12 @@ import (
 type UserRepositoryInterface interface {
 	CreateUser(d entity.DataUserEntity) entity.DataUserEntity
 	GetAllUser() ([]entity.DataUserEntity, bool)
-	GetUserById(id string) (entity.DataUserEntity, bool)
+	GetUserByID(id string) (entity.DataUserEntity, bool)
 	GetUserByUserName(username string) (entity.DataUserEntity, bool)
 	GetUserByEmail(email string) (entity.DataUserEntity, bool)
 	GetUserByName(firstName, lastName string) []entity.DataUserEntity
-	DeleteUserById(id string) (entity.DataUserEntity, bool)
-	// UpdateUserById(id string) (entity.DataUserEntity, bool)
+	DeleteUserByID(id string) (entity.DataUserEntity, bool)
+	UpdateUserByID(id string, d entity.DataUserEntity) (entity.DataUserEntity)
 }
 
 type UserRepository struct{}
@@ -42,7 +42,7 @@ func (u UserRepository) GetAllUser() ([]entity.DataUserEntity, bool) {
 }
 
 // GetUserById return specific user detail by id
-func (u UserRepository) GetUserById(id string) (entity.DataUserEntity, bool) {
+func (u UserRepository) GetUserByID(id string) (entity.DataUserEntity, bool) {
 	// Iterate through list and print its contents.
 	for e := l.Front(); e != nil; e = e.Next() {
 		data := e.Value.(entity.DataUserEntity)
@@ -91,7 +91,7 @@ func (u UserRepository) GetUserByName(firstName, lastName string) []entity.DataU
 	return user
 }
 
-func (u UserRepository) DeleteUserById(id string) (entity.DataUserEntity, bool) {
+func (u UserRepository) DeleteUserByID(id string) (entity.DataUserEntity, bool) {
 	for e := l.Front(); e != nil; e = e.Next() {
 		data := e.Value.(entity.DataUserEntity)
 		if id == data.ID {
@@ -103,6 +103,15 @@ func (u UserRepository) DeleteUserById(id string) (entity.DataUserEntity, bool) 
 	return entity.DataUserEntity{}, false
 }
 
-// func (u UserRepository) UpdateUserById(id string) (entity.DataUserEntity, bool) {
+func (u UserRepository) UpdateUserByID(id string, d entity.DataUserEntity) (entity.DataUserEntity) {
+	for e := l.Front(); e != nil; e = e.Next() {
+		data := e.Value.(entity.DataUserEntity)
+		if id == data.ID {
+			l.Remove(e)
+			l.PushFront(d)
+			return d
+		}
+	}
 
-// }
+	return d
+}
