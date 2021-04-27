@@ -137,7 +137,7 @@ func GetUserByEmailHandler() gin.HandlerFunc {
 	}
 }
 
-func GetUserByIdHandler() gin.HandlerFunc {
+func GetUserByIDHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		role, _ := c.Get("Role")
 
@@ -150,7 +150,7 @@ func GetUserByIdHandler() gin.HandlerFunc {
 		}
 
 		var userService UserServiceInterface = UserService{}
-		userData, isExist := userService.GetUserById(c.Param("id"))
+		userData, isExist := userService.GetUserByID(c.Param("id"))
 
 		if !isExist {
 			c.JSON(http.StatusOK, gin.H{
@@ -167,8 +167,8 @@ func GetUserByIdHandler() gin.HandlerFunc {
 	}
 }
 
-func DeleteUserById() gin.HandlerFunc {
-		return func(c *gin.Context) {
+func DeleteUserByID() gin.HandlerFunc {
+	return func(c *gin.Context) {
 		role, _ := c.Get("Role")
 
 		if role != "admin" {
@@ -180,7 +180,7 @@ func DeleteUserById() gin.HandlerFunc {
 		}
 
 		var userService UserServiceInterface = UserService{}
-		userData, isExist := userService.DeleteUserById(c.Param("id"))
+		userData, isExist := userService.DeleteUserByID(c.Param("id"))
 
 		if !isExist {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -192,7 +192,43 @@ func DeleteUserById() gin.HandlerFunc {
 
 		c.JSON(http.StatusOK, gin.H{
 			"status": "ok",
-			"data": userData,
+			"data":   userData,
+		})
+	}
+}
+
+func UpdateUserByID() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		role, _ := c.Get("Role")
+
+		if role != "admin" {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status":  "error",
+				"message": "forbidden",
+			})
+			return
+		}
+
+		var data entity.UpdateUserEntity
+		err := c.ShouldBindJSON(&data)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		var userService UserServiceInterface = UserService{}
+		userData, err := userService.UpdateUserByID(c.Param("id"), data)
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status": "error",
+				"message": err.Error(),
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"status": "ok",
+			"data":   userData,
 		})
 	}
 }
