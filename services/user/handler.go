@@ -2,6 +2,7 @@ package user
 
 import (
 	"bootcamp/entity"
+	"bootcamp/repository"
 	"fmt"
 	"net/http"
 
@@ -22,14 +23,15 @@ func CreateUserHandler() gin.HandlerFunc {
 		}
 
 		var data entity.RegistrationUserEntity
-		var userService UserServiceInterface = UserService{}
+		repositoryService := repository.UserRepository{}
+		userService := UserService{repositoryService}
 
 		err := c.ShouldBindJSON(&data)
 		if err != nil {
 			fmt.Println(err)
 		}
 
-		dataUser, err := userService.CreateUser(data)
+		status, err := userService.CreateUser(data)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"status":  "error",
@@ -39,8 +41,8 @@ func CreateUserHandler() gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"status": "ok",
-			"data":   dataUser,
+			"status":  "ok",
+			"message": status,
 		})
 	}
 }
@@ -58,11 +60,12 @@ func GetAllUserHandler() gin.HandlerFunc {
 			return
 		}
 
-		var userService UserServiceInterface = UserService{}
-		userData, isExist := userService.GetAllUser()
+		repositoryService := repository.UserRepository{}
+		userService := UserService{repositoryService}
+		userData, err := userService.GetAllUser()
 
-		if !isExist {
-			c.JSON(http.StatusBadRequest, gin.H{
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{
 				"status": "ok",
 				"data":   "null",
 			})
@@ -89,10 +92,11 @@ func GetUserByUsernameHandler() gin.HandlerFunc {
 			return
 		}
 
-		var userService UserServiceInterface = UserService{}
-		userData, isExist := userService.GetUserByUsername(c.Param("username"))
+		repositoryService := repository.UserRepository{}
+		userService := UserService{repositoryService}
+		userData, err := userService.GetUserByUserName(c.Param("username"))
 
-		if !isExist {
+		if err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status": "ok",
 				"data":   "null",
@@ -119,10 +123,11 @@ func GetUserByEmailHandler() gin.HandlerFunc {
 			return
 		}
 
-		var userService UserServiceInterface = UserService{}
-		userData, isExist := userService.GetUserByEmail(c.Param("email"))
+		repositoryService := repository.UserRepository{}
+		userService := UserService{repositoryService}
+		userData, err := userService.GetUserByEmail(c.Param("email"))
 
-		if !isExist {
+		if err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status": "ok",
 				"data":   "null",
@@ -149,10 +154,11 @@ func GetUserByIDHandler() gin.HandlerFunc {
 			return
 		}
 
-		var userService UserServiceInterface = UserService{}
-		userData, isExist := userService.GetUserByID(c.Param("id"))
+		repositoryService := repository.UserRepository{}
+		userService := UserService{repositoryService}
+		userData, err := userService.GetUserByID(c.Param("id"))
 
-		if !isExist {
+		if err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"status": "ok",
 				"data":   "null",
@@ -179,20 +185,20 @@ func DeleteUserByID() gin.HandlerFunc {
 			return
 		}
 
-		var userService UserServiceInterface = UserService{}
-		userData, isExist := userService.DeleteUserByID(c.Param("id"))
+		repositoryService := repository.UserRepository{}
+		userService := UserService{repositoryService}
+		err := userService.DeleteUserByID(c.Param("id"))
 
-		if !isExist {
-			c.JSON(http.StatusBadRequest, gin.H{
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{
 				"status": "ok",
-				"data":   "null",
+				"message":   err.Error(),
 			})
 			return
 		}
 
 		c.JSON(http.StatusOK, gin.H{
 			"status": "ok",
-			"data":   userData,
 		})
 	}
 }
@@ -215,12 +221,13 @@ func UpdateUserByID() gin.HandlerFunc {
 			fmt.Println(err)
 		}
 
-		var userService UserServiceInterface = UserService{}
+		repositoryService := repository.UserRepository{}
+		userService := UserService{repositoryService}
 		userData, err := userService.UpdateUserByID(c.Param("id"), data)
 
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
-				"status": "error",
+				"status":  "error",
 				"message": err.Error(),
 			})
 			return
