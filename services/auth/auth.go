@@ -13,17 +13,17 @@ type AuthServiceInterface interface {
 }
 
 type AuthService struct {
-	repository repository.UserRepository
+	Repository repository.UserRepositoryInterface
 }
 
 func (service AuthService) LoginService(username, password string) (entity.DataUserEntity, error) {
-	user, isExist := service.repository.GetUserByUserName(username)
+	user, err := service.Repository.GetUserByUserName(username)
 
-	if !isExist {
+	if err != nil {
 		return entity.DataUserEntity{}, errors.New("user not found")
 	}
 
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
 		return entity.DataUserEntity{}, err
 	}
