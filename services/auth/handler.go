@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"bootcamp/repository"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -9,7 +10,8 @@ import (
 func LoginHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		username, password, _ := c.Request.BasicAuth()
-		var authService AuthServiceInterface = AuthService{}
+		repositoryService := repository.UserRepository{}
+		authService := AuthService{repositoryService}
 		user, err := authService.LoginService(username, password)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{
