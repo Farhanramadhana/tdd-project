@@ -3,17 +3,17 @@ package repository
 import (
 	"bootcamp/entity"
 	"container/list"
+	"errors"
 )
 
 type UserRepositoryInterface interface {
-	CreateUser(d entity.DataUserEntity) entity.DataUserEntity
-	GetAllUser() ([]entity.DataUserEntity, bool)
-	GetUserByID(id string) (entity.DataUserEntity, bool)
-	GetUserByUserName(username string) (entity.DataUserEntity, bool)
-	GetUserByEmail(email string) (entity.DataUserEntity, bool)
-	GetUserByName(firstName, lastName string) []entity.DataUserEntity
-	DeleteUserByID(id string) (entity.DataUserEntity, bool)
-	UpdateUserByID(id string, d entity.DataUserEntity) (entity.DataUserEntity)
+	CreateUser(d entity.DataUserEntity) bool
+	GetAllUser() ([]entity.DataUserEntity, error)
+	GetUserByID(id string) (entity.DataUserEntity, error)
+	GetUserByUserName(username string) (entity.DataUserEntity, error)
+	GetUserByEmail(email string) (entity.DataUserEntity, error)
+	DeleteUserByID(id string) error
+	UpdateUserByID(id string, d entity.DataUserEntity) (entity.DataUserEntity, error)
 }
 
 type UserRepository struct{}
@@ -21,16 +21,16 @@ type UserRepository struct{}
 var l = list.New()
 
 // CreateUser is to save data to linkedlist
-func (u UserRepository) CreateUser(d entity.DataUserEntity) entity.DataUserEntity {
+func (u UserRepository) CreateUser(d entity.DataUserEntity) bool {
 	l.PushFront(d)
-	return d
+	return true
 }
 
 // GetAllUser return all user detail
-func (u UserRepository) GetAllUser() ([]entity.DataUserEntity, bool) {
+func (u UserRepository) GetAllUser() ([]entity.DataUserEntity, error) {
 	var data []entity.DataUserEntity
 	if l.Len() <= 0 {
-		return data, false
+		return data, errors.New("data doesn't exist")
 	}
 
 	// Iterate through list and print its contents.
@@ -38,43 +38,43 @@ func (u UserRepository) GetAllUser() ([]entity.DataUserEntity, bool) {
 		data = append(data, e.Value.(entity.DataUserEntity))
 	}
 
-	return data, true
+	return data, nil
 }
 
 // GetUserById return specific user detail by id
-func (u UserRepository) GetUserByID(id string) (entity.DataUserEntity, bool) {
+func (u UserRepository) GetUserByID(id string) (entity.DataUserEntity, error) {
 	// Iterate through list and print its contents.
 	for e := l.Front(); e != nil; e = e.Next() {
 		data := e.Value.(entity.DataUserEntity)
 		if id == data.ID {
-			return data, true
+			return data, nil
 		}
 	}
-	return entity.DataUserEntity{}, false
+	return entity.DataUserEntity{}, errors.New("data doesn't exist")
 }
 
 // GetUserByUserName return specific user detail by username
-func (u UserRepository) GetUserByUserName(username string) (entity.DataUserEntity, bool) {
+func (u UserRepository) GetUserByUserName(username string) (entity.DataUserEntity, error) {
 	// Iterate through list and print its contents.
 	for e := l.Front(); e != nil; e = e.Next() {
 		data := e.Value.(entity.DataUserEntity)
 		if username == data.Username {
-			return data, true
+			return data, nil
 		}
 	}
-	return entity.DataUserEntity{}, false
+	return entity.DataUserEntity{}, errors.New("user doesn't exist")
 }
 
 // GetUserByEmail return specific user detail by email
-func (u UserRepository) GetUserByEmail(email string) (entity.DataUserEntity, bool) {
+func (u UserRepository) GetUserByEmail(email string) (entity.DataUserEntity, error) {
 	// Iterate through list and print its contents.
 	for e := l.Front(); e != nil; e = e.Next() {
 		data := e.Value.(entity.DataUserEntity)
 		if email == data.Email {
-			return data, true
+			return data, nil
 		}
 	}
-	return entity.DataUserEntity{}, false
+	return entity.DataUserEntity{}, errors.New("user doesn't exist")
 }
 
 // GetUserByName return specific user detail by name
@@ -91,27 +91,27 @@ func (u UserRepository) GetUserByName(firstName, lastName string) []entity.DataU
 	return user
 }
 
-func (u UserRepository) DeleteUserByID(id string) (entity.DataUserEntity, bool) {
+func (u UserRepository) DeleteUserByID(id string) (error) {
 	for e := l.Front(); e != nil; e = e.Next() {
 		data := e.Value.(entity.DataUserEntity)
 		if id == data.ID {
 			l.Remove(e)
-			return e.Value.(entity.DataUserEntity), true
+			return nil
 		}
 	}
 
-	return entity.DataUserEntity{}, false
+	return errors.New("user doesn't exist")
 }
 
-func (u UserRepository) UpdateUserByID(id string, d entity.DataUserEntity) (entity.DataUserEntity) {
+func (u UserRepository) UpdateUserByID(id string, d entity.DataUserEntity) (entity.DataUserEntity, error) {
 	for e := l.Front(); e != nil; e = e.Next() {
 		data := e.Value.(entity.DataUserEntity)
 		if id == data.ID {
 			l.Remove(e)
 			l.PushFront(d)
-			return d
+			return d, nil
 		}
 	}
 
-	return d
+	return d, errors.New("user doesn't exist")
 }
