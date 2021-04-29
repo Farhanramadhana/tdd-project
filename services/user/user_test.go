@@ -353,35 +353,25 @@ func TestCreateInitialName(t *testing.T) {
 	})
 }
 
-// func TestGenerateUserName(t *testing.T) {
-// 	t.Run("one", func(t *testing.T) {
-// 		name := []string{"stona", "", ""}
-// 		result := GenerateUserName(name)
-// 		assert.Equal(t, "stona", result)
-// 	})
-// 	t.Run("two", func(t *testing.T) {
-// 		name := []string{"stona", "", "stoni"}
-// 		result := GenerateUserName(name)
-// 		assert.Equal(t, "stona.stoni", result)
-// 	})
-// 	t.Run("three", func(t *testing.T) {
-// 		name := []string{"stona", "stoni", "stino"}
-// 		result := GenerateUserName(name)
-// 		assert.Equal(t, "stona.stino1", result)
-// 	})
-// 	t.Run("four", func(t *testing.T) {
-// 		name := []string{"stona", "", "stoni"}
-// 		result := GenerateUserName(name)
-// 		assert.Equal(t, "stona.stoni2", result)
-// 	})
-// 	t.Run("five", func(t *testing.T) {
-// 		name := []string{"stona", "", "stoni"}
-// 		result := GenerateUserName(name)
-// 		assert.Equal(t, "stona.stoni3", result)
-// 	})
-// 	t.Run("six", func(t *testing.T) {
-// 		name := []string{"stona", "", "stoni"}
-// 		result := GenerateUserName(name)
-// 		assert.Equal(t, "stona.stoni4", result)
-// 	})
-// }
+func TestGenerateUserName(t *testing.T) {
+	t.Run("one", func(t *testing.T) {
+		name := []string{"stona", "", ""}
+		result := GenerateUserName(name)
+		assert.Equal(t, "stona", result)
+	})
+	t.Run("two", func(t *testing.T) {
+		name := []string{"stona", "", "stoni"}
+		result := GenerateUserName(name)
+		assert.Equal(t, "stona.stoni", result)
+	})
+	t.Run("three", func(t *testing.T) {
+		name := []string{"stino", "stoni", ""}
+		result := GenerateUserName(name)
+		assert.Equal(t, "stino", result)
+	})
+	t.Run("four", func(t *testing.T) {
+		name := []string{"stino", "", "stona"}
+		result := GenerateUserName(name)
+		assert.Equal(t, "stino.stona", result)
+	})
+}
