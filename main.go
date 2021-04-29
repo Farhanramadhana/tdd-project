@@ -3,6 +3,7 @@ package main
 import (
 	"bootcamp/config"
 	"bootcamp/entity"
+	"bootcamp/repository"
 	"bootcamp/services/auth"
 	"bootcamp/services/user"
 	"fmt"
@@ -18,8 +19,9 @@ func main() {
 		Password: "admin12345",
 		Role:     "admin",
 	}
-
-	var userService user.UserServiceInterface = user.UserService{}
+	
+	userRepository := repository.UserRepository{}
+	userService := user.UserService{userRepository}
 	createUser, err := userService.CreateUser(superAdmin)
 	if err != nil {
 		fmt.Print(err.Error())
