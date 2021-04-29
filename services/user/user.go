@@ -4,7 +4,6 @@ import (
 	"bootcamp/config"
 	"bootcamp/entity"
 	"bootcamp/repository"
-	"errors"
 	"fmt"
 	"math/rand"
 	"strconv"
@@ -15,28 +14,28 @@ import (
 )
 
 type UserServiceInterface interface {
-	CreateUser(data entity.RegistrationUserEntity) (entity.DataUserEntity, error)
-	GetAllUser() ([]entity.DataUserEntity, bool)
-	GetUserByUsername(username string) (entity.DataUserEntity, bool)
-	GetUserByID(id string) (entity.DataUserEntity, bool)
+	CreateUser(data entity.RegistrationUserEntity) (bool, error)
+	GetAllUser() ([]entity.DataUserEntity, error)
+	GetUserByUserName(username string) (entity.DataUserEntity, bool)
+	GetUserByID(id string) (entity.DataUserEntity, error)
 	GetUserByEmail(email string) (entity.DataUserEntity, bool)
-	DeleteUserByID(id string) (entity.DataUserEntity, bool)
+	DeleteUserByID(id string) error
 	UpdateUserByID(id string, data entity.UpdateUserEntity) (entity.DataUserEntity, error)
 }
 
 type UserService struct {
-	repository repository.UserRepository
+	Repository repository.UserRepositoryInterface
 }
 
 // CreateUser func is used to create user data
-func (service UserService) CreateUser(data entity.RegistrationUserEntity) (entity.DataUserEntity, error) {
+func (service UserService) CreateUser(data entity.RegistrationUserEntity) (bool, error) {
 	var validate config.Validator
 
 	v := validate.NewValidator()
 	err := v.Validate(data)
 
 	if err != nil {
-		return entity.DataUserEntity{}, err
+		return false, err
 	}
 
 	name := SplitFullName(data.FullName)
@@ -58,38 +57,38 @@ func (service UserService) CreateUser(data entity.RegistrationUserEntity) (entit
 		UpdatedAt:   time.Now().Format(time.RFC3339),
 	}
 
-	dataUser := service.repository.CreateUser(user)
-	return dataUser, nil
+	status := service.Repository.CreateUser(user)
+	return status, nil
 }
 
 // GetAllUser func is used to retrieve all user data
-func (service UserService) GetAllUser() ([]entity.DataUserEntity, bool) {
-	userData, isExist := service.repository.GetAllUser()
+func (service UserService) GetAllUser() ([]entity.DataUserEntity, error) {
+	userData, isExist := service.Repository.GetAllUser()
 	return userData, isExist
 }
 
-// GetUserByUsername func is used to retrieve specific user data by username
-func (service UserService) GetUserByUsername(username string) (entity.DataUserEntity, bool) {
-	userData, isExist := service.repository.GetUserByUserName(username)
-	return userData, isExist
+// GetUserByUserName func is used to retrieve specific user data by username
+func (service UserService) GetUserByUserName(username string) (entity.DataUserEntity, error) {
+	userData, err := service.Repository.GetUserByUserName(username)
+	return userData, err
 }
 
 // GetUserById func is used to retrieve specific user data by user id
-func (service UserService) GetUserByID(id string) (entity.DataUserEntity, bool) {
-	userData, isExist := service.repository.GetUserByID(id)
-	return userData, isExist
+func (service UserService) GetUserByID(id string) (entity.DataUserEntity, error) {
+	userData, err := service.Repository.GetUserByID(id)
+	return userData, err
 }
 
 // GetUserByEmail func is used to retrieve specific user data by email
-func (service UserService) GetUserByEmail(email string) (entity.DataUserEntity, bool) {
-	userData, isExist := service.repository.GetUserByEmail(email)
-	return userData, isExist
+func (service UserService) GetUserByEmail(email string) (entity.DataUserEntity, error) {
+	userData, err := service.Repository.GetUserByEmail(email)
+	return userData, err
 }
 
 // DeleteUserByID func is used to delete specific user data by id
-func (service UserService) DeleteUserByID(id string) (entity.DataUserEntity, bool) {
-	userData, isExist := service.repository.DeleteUserByID(id)
-	return userData, isExist
+func (service UserService) DeleteUserByID(id string) error {
+	err := service.Repository.DeleteUserByID(id)
+	return err
 }
 
 // UpdateUserByID func is used to update specific user data by id
@@ -104,10 +103,10 @@ func (service UserService) UpdateUserByID(id string, data entity.UpdateUserEntit
 		return entity.DataUserEntity{}, err
 	}
 
-	existingData, isExist := service.repository.GetUserByID(id)
+	existingData, err := service.Repository.GetUserByID(id)
 
-	if !isExist {
-		return entity.DataUserEntity{}, errors.New("User not found")
+	if err != nil {
+		return entity.DataUserEntity{}, err
 	}
 
 	user.ID = existingData.ID
@@ -117,7 +116,7 @@ func (service UserService) UpdateUserByID(id string, data entity.UpdateUserEntit
 
 		name := SplitFullName(data.FullName)
 		initialName = CreateInitialName(data.FullName)
-		
+
 		if existingData.FirstName != name[0] || existingData.LastName != name[2] {
 			userName = GenerateUserName(name)
 		}
@@ -147,8 +146,8 @@ func (service UserService) UpdateUserByID(id string, data entity.UpdateUserEntit
 
 	user.UpdatedAt = time.Now().Format(time.RFC3339)
 
-	userData := service.repository.UpdateUserByID(id, user)
-	return userData, nil
+	userData, err := service.Repository.UpdateUserByID(id, user)
+	return userData, err
 }
 
 // SplitFullName is func to split fullname to first, middle, and last of Name
@@ -187,7 +186,7 @@ func CreateInitialName(fullName string) string {
 // GenerateUserName is func to split create initial name
 func GenerateUserName(name []string) string {
 	// find userName, if already exist add index number
-	var service repository.UserRepositoryInterface = repository.UserRepository{}
+	var service repository.UserRepository
 	data := service.GetUserByName(name[0], name[2])
 	totalData := len(data)
 
