@@ -39,8 +39,8 @@ func (service UserService) CreateUser(data entity.RegistrationUserEntity) (entit
 		return entity.DataUserEntity{}, err
 	}
 
-	_, err = service.Repository.GetUserByEmail(data.Email)
-	if err == nil {
+	existingUser, err := service.Repository.GetUserByEmail(data.Email)
+	if existingUser.Email != "" {
 		return entity.DataUserEntity{}, errors.New("email already exist")
 	}
 
