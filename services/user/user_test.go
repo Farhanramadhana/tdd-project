@@ -13,9 +13,9 @@ type userRepositoryMock struct {
 	mock.Mock
 }
 
-func (repository *userRepositoryMock) CreateUser(d entity.DataUserEntity) bool {
+func (repository *userRepositoryMock) CreateUser(d entity.DataUserEntity) (entity.DataUserEntity, error) {
 	arguments := repository.Called(d)
-	return arguments.Bool(0)
+	return arguments.Get(0).(entity.DataUserEntity), arguments.Error(1)
 }
 
 func (repository *userRepositoryMock) GetAllUser() ([]entity.DataUserEntity, error) {
@@ -78,11 +78,12 @@ func TestCreateUser_Success(t *testing.T) {
 		Password: "1234567890",
 	}
 
-	repoMock.On("CreateUser", mock.AnythingOfType("entity.DataUserEntity")).Return(true)
+	repoMock.On("GetUserByEmail", "farhan@kata.ai").Return(entity.DataUserEntity{}, nil)
+	repoMock.On("CreateUser", mock.AnythingOfType("entity.DataUserEntity")).Return(entity.DataUserEntity{}, nil)
 	u := UserService{repoMock}
-	status, err := u.CreateUser(input)
-	assert.Equal(t, true, status)
+	userData, err := u.CreateUser(input)
 	assert.Nil(t, err)
+	assert.NotNil(t, userData)
 }
 
 func TestCreateUser_Failed(t *testing.T) {
@@ -208,7 +209,7 @@ func TestGetUserByID_Failed(t *testing.T) {
 
 	data := entity.DataUserEntity{}
 
-	repoMock.On("GetUserByID","1").Return(data, errors.New("data doesn't exist"))
+	repoMock.On("GetUserByID", "1").Return(data, errors.New("data doesn't exist"))
 
 	_, err := u.GetUserByID("1")
 	assert.NotNil(t, err)
@@ -293,6 +294,7 @@ func TestDeleteUserByID_Success(t *testing.T) {
 	repoMock := new(userRepositoryMock)
 	u := UserService{repoMock}
 
+	repoMock.On("GetUserByID", "zy95jC0t9rQU").Return(entity.DataUserEntity{}, nil)
 	repoMock.On("DeleteUserByID", "zy95jC0t9rQU").Return(nil)
 
 	err := u.DeleteUserByID("zy95jC0t9rQU")
@@ -303,7 +305,7 @@ func TestDeleteUserByID_Failed(t *testing.T) {
 	repoMock := new(userRepositoryMock)
 	u := UserService{repoMock}
 
-	repoMock.On("DeleteUserByID", "zy95jC0t9rQU").Return(errors.New("data does'nt exist"))
+	repoMock.On("GetUserByID", "zy95jC0t9rQU").Return(entity.DataUserEntity{}, errors.New("data doesn't exist"))
 
 	err := u.DeleteUserByID("zy95jC0t9rQU")
 	assert.NotNil(t, err)
