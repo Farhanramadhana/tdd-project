@@ -2,31 +2,14 @@ package main
 
 import (
 	"bootcamp/config"
-	"bootcamp/entity"
-	"bootcamp/repository"
+
 	"bootcamp/services/auth"
 	"bootcamp/services/user"
-	"fmt"
 )
 
 func main() {
 	s := config.New(config.Options{Port: 50001})
 
-	// predifines admin user
-	superAdmin := entity.RegistrationUserEntity{
-		FullName: "super admin",
-		Email:    "superadmin@admin.com",
-		Password: "admin12345",
-		Role:     "admin",
-	}
-	
-	userRepository := repository.UserRepository{}
-	userService := user.UserService{userRepository}
-	createUser, err := userService.CreateUser(superAdmin)
-	if err != nil {
-		fmt.Print(err.Error())
-	}
-	fmt.Print(createUser)
 	authorized := s.GinServer.Group("/")
 	authorized.Use(auth.LoginHandler())
 	{
