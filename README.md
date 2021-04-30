@@ -66,7 +66,7 @@ go test -v
             "Password": "$2a$04$i8Yy5Hk2UNkOrocccqbYh.dkWqLge2EkxekBq2t4dY88tMmhQJJ8u",
             "UpdatedAt": "2021-04-30T07:55:31+07:00"
         },
-    "status": "ok"
+        "status": "ok"
      ```
  - Error Response
      - ```rest
@@ -101,7 +101,7 @@ go test -v
             "Password": "$2a$04$i8Yy5Hk2UNkOrocccqbYh.dkWqLge2EkxekBq2t4dY88tMmhQJJ8u",
             "UpdatedAt": "2021-04-30T07:55:31+07:00"
         }],
-    "status": "ok"
+        "status": "ok"
      ```
  - Error Response
      - ```rest
@@ -133,7 +133,7 @@ go test -v
             "Password": "$2a$04$i8Yy5Hk2UNkOrocccqbYh.dkWqLge2EkxekBq2t4dY88tMmhQJJ8u",
             "UpdatedAt": "2021-04-30T07:55:31+07:00"
         },
-    "status": "ok"
+        "status": "ok"
      ```
  - Error Response
      - ```rest
@@ -165,7 +165,7 @@ go test -v
             "Password": "$2a$04$i8Yy5Hk2UNkOrocccqbYh.dkWqLge2EkxekBq2t4dY88tMmhQJJ8u",
             "UpdatedAt": "2021-04-30T07:55:31+07:00"
         },
-    "status": "ok"
+        "status": "ok"
      ```
  - Error Response
      - ```rest
@@ -197,7 +197,7 @@ go test -v
             "Password": "$2a$04$i8Yy5Hk2UNkOrocccqbYh.dkWqLge2EkxekBq2t4dY88tMmhQJJ8u",
             "UpdatedAt": "2021-04-30T07:55:31+07:00"
         },
-    "status": "ok"
+        "status": "ok"
      ```
  - Error Response
      - ```rest
@@ -258,7 +258,7 @@ go test -v
             "Password": "$2a$04$i8Yy5Hk2UNkOrocccqbYh.dkWqLge2EkxekBq2t4dY88tMmhQJJ8u",
             "UpdatedAt": "2021-04-30T07:55:31+07:00"
         },
-    "status": "ok"
+        "status": "ok"
      ```
  - Error Response
      - ```rest
