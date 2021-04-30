@@ -16,7 +16,7 @@ This Project implement:
 4. Repository (this folder/package is used to store data or communicate to database)
 
 # Project Dependencies
-```go
+```bash
     github.com/gin-gonic/gin 
 	github.com/go-playground/validator/v10 
 	github.com/stretchr/testify
