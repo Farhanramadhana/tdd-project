@@ -4,6 +4,7 @@ import (
 	"bootcamp/config"
 	"bootcamp/entity"
 	"bootcamp/repository"
+	"errors"
 	"fmt"
 	"math/rand"
 	"strconv"
@@ -36,6 +37,11 @@ func (service UserService) CreateUser(data entity.RegistrationUserEntity) (entit
 
 	if err != nil {
 		return entity.DataUserEntity{}, err
+	}
+
+	_, err = service.Repository.GetUserByEmail(data.Email)
+	if err == nil {
+		return entity.DataUserEntity{}, errors.New("email already exist")
 	}
 
 	name := SplitFullName(data.FullName)
@@ -87,8 +93,13 @@ func (service UserService) GetUserByEmail(email string) (entity.DataUserEntity, 
 
 // DeleteUserByID func is used to delete specific user data by id
 func (service UserService) DeleteUserByID(id string) error {
-	err := service.Repository.DeleteUserByID(id)
-	return err
+	_, err := service.Repository.GetUserByID(id)
+	if err != nil {
+		return err
+	}
+
+	_ = service.Repository.DeleteUserByID(id)
+	return nil
 }
 
 // UpdateUserByID func is used to update specific user data by id
@@ -186,23 +197,29 @@ func CreateInitialName(fullName string) string {
 // GenerateUserName is func to split create initial name
 func GenerateUserName(name []string) string {
 	// find userName, if already exist add index number
-	var service repository.UserRepository
-	data := service.GetUserByName(name[0], name[2])
-	totalData := len(data)
+	//name[0] is firstname, name[1] is middlename, name[2] is lastname
 
-	var userName string
-	if totalData >= 1 && name[2] != "" {
-		index := totalData + 1
-		userName = name[0] + "." + name[2] + strconv.Itoa(index)
-	} else if totalData >= 1 && name[2] == "" {
-		index := totalData + 1
-		userName = name[0] + strconv.Itoa(index)
-	} else if totalData == 0 && name[2] != "" {
-		userName = name[0] + "." + name[2]
-	} else {
-		userName = name[0]
+	var service repository.UserRepository
+	userName := name[0]
+
+	if name[2] != "" {
+		userName += "." + name[2]
 	}
 
+	_, err := service.GetUserByUserName(userName)
+
+	if err != nil {
+		return userName
+	}
+
+	i := 1
+	var userName2 string
+	for err == nil {
+		userName2 = userName + strconv.Itoa(i)
+		_, err = service.GetUserByUserName(userName2)
+		i++
+	}
+	userName = userName2
 	return userName
 }
 
