@@ -15,7 +15,7 @@ This Project implement:
 3. Service (this folder/package contain all business logic)
 4. Repository (this folder/package is used to store data or communicate to database)
 
-# Project dependencies
+# Project Dependencies
 ```go
     github.com/gin-gonic/gin 
 	github.com/go-playground/validator/v10 
