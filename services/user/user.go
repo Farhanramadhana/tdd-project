@@ -14,7 +14,7 @@ import (
 )
 
 type UserServiceInterface interface {
-	CreateUser(data entity.RegistrationUserEntity) (bool, error)
+	CreateUser(data entity.RegistrationUserEntity) (entity.DataUserEntity, error)
 	GetAllUser() ([]entity.DataUserEntity, error)
 	GetUserByUserName(username string) (entity.DataUserEntity, bool)
 	GetUserByID(id string) (entity.DataUserEntity, error)
@@ -28,14 +28,14 @@ type UserService struct {
 }
 
 // CreateUser func is used to create user data
-func (service UserService) CreateUser(data entity.RegistrationUserEntity) (bool, error) {
+func (service UserService) CreateUser(data entity.RegistrationUserEntity) (entity.DataUserEntity, error) {
 	var validate config.Validator
 
 	v := validate.NewValidator()
 	err := v.Validate(data)
 
 	if err != nil {
-		return false, err
+		return entity.DataUserEntity{}, err
 	}
 
 	name := SplitFullName(data.FullName)
@@ -57,8 +57,8 @@ func (service UserService) CreateUser(data entity.RegistrationUserEntity) (bool,
 		UpdatedAt:   time.Now().Format(time.RFC3339),
 	}
 
-	status := service.Repository.CreateUser(user)
-	return status, nil
+	userData, err := service.Repository.CreateUser(user)
+	return userData, err
 }
 
 // GetAllUser func is used to retrieve all user data

@@ -26,12 +26,9 @@ func CreateUserHandler() gin.HandlerFunc {
 		repositoryService := repository.UserRepository{}
 		userService := UserService{repositoryService}
 
-		err := c.ShouldBindJSON(&data)
-		if err != nil {
-			fmt.Println(err)
-		}
+		_ = c.ShouldBindJSON(&data)
 
-		status, err := userService.CreateUser(data)
+		userData, err := userService.CreateUser(data)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"status":  "error",
@@ -42,7 +39,7 @@ func CreateUserHandler() gin.HandlerFunc {
 
 		c.JSON(http.StatusOK, gin.H{
 			"status":  "ok",
-			"message": status,
+			"data": userData,
 		})
 	}
 }
