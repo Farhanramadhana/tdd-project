@@ -59,7 +59,7 @@ go test -v
             "status": "ok"
          }
      ```
- - Error Response
+ - Error Response s
      - ```rest
         {
             "message": "",
