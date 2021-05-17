@@ -14,16 +14,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type UserServiceInterface interface {
-	CreateUser(data entity.RegistrationUserEntity) (entity.DataUserEntity, error)
-	GetAllUser() ([]entity.DataUserEntity, error)
-	GetUserByUserName(username string) (entity.DataUserEntity, bool)
-	GetUserByID(id string) (entity.DataUserEntity, error)
-	GetUserByEmail(email string) (entity.DataUserEntity, bool)
-	DeleteUserByID(id string) error
-	UpdateUserByID(id string, data entity.UpdateUserEntity) (entity.DataUserEntity, error)
-}
-
 type UserService struct {
 	Repository repository.UserRepositoryInterface
 }
