@@ -77,7 +77,6 @@ func GetAllUserHandler() gin.HandlerFunc {
 }
 
 func GetUserByUsernameHandler() gin.HandlerFunc {
-	fmt.Print("lalalal")
 	return func(c *gin.Context) {
 		role, _ := c.Get("Role")
 
